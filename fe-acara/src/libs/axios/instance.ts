@@ -8,7 +8,7 @@ interface CustomSession extends Session {
 }
 
 const headers = {
-    "Content-Type": "aplication/json",
+    "Content-Type": "application/json",
 }
 
 const instance = axios.create({
