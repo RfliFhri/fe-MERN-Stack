@@ -1,13 +1,13 @@
-import { useState } from "react";
-import * as yup from "yup";
-import {useForm} from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { IRegister } from "@/types/Auth";
-import authServices from "@/services/auth";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import * as yup from 'yup';
+import { ILogin } from "@/types/Auth";
+import authServices from "@/services/auth.service";
 
-const registerSchema = yup.object().shape({
+const loginSchema = yup.object().shape({
     fullName: yup.string().required("Please input your fullname"),
     username: yup.string().required("Please input your username"),
     email: yup.string().email("Email format nnot valid").required("Please input your email"),
@@ -15,26 +15,25 @@ const registerSchema = yup.object().shape({
     confirmPassword: yup.string().oneOf([yup.ref("password"), ""], "Password not match").required("Please input your password confirmation"),
 });
 
-const useRegister = () => {
+const useLogin = () => {
     const router = useRouter();
     const [visiblePassword, setVisiblePassword] = useState({
-        password: false,
-        passwordConfirmation: false,
-    });
-
-    const handleVisiblePassword = (key: "password" | "passwordConfirmation") => {
+            password: false,
+            passwordConfirmation: false,
+        });
+    
+    const handleVisiblePassword = (key: "password") => {
         setVisiblePassword({
             ...visiblePassword,
             [key]: !visiblePassword[key],
         });
     };
-
     const {control, handleSubmit, formState: {errors}, reset, setError} = useForm({
-        resolver: yupResolver(registerSchema)
+        resolver: yupResolver(loginSchema)
     });
 
-    const registerService = async (payload: IRegister) => {
-        const result = await authServices.register(payload);
+    const registerService = async (payload: ILogin) => {
+        const result = await authServices.login(payload);
         return result;
     };
 
@@ -51,7 +50,7 @@ const useRegister = () => {
         },
     });
 
-    const handleRegister = (data: IRegister) => mutateRegister(data);
+    const handleRegister = (data: ILogin) => mutateRegister(data);
 
     return{
         visiblePassword,
@@ -64,4 +63,4 @@ const useRegister = () => {
     };
 };
 
-export default useRegister;
+export default useLogin;
