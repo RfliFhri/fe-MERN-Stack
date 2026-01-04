@@ -7,7 +7,7 @@ import useLogin from "./useLogin";
 import { cn } from "@/utils/cn";
 
 const Login = () => {
-    const {visiblePassword, handleVisiblePassword, control, handleSubmit, handleRegister, isPendingRegister, errors} = useLogin();
+    const {isVisible, toggleVisible, control, handleSubmit, handleLogin, isPendingLogin, errors} = useLogin();
     return (
         <>
             <div className="flex flex-col items-center justify-center w-full gap-10 lg:flex-row lg:gap-20">
@@ -17,28 +17,34 @@ const Login = () => {
                 </div>
                 <Card>
                     <CardBody className="p-8">
-                        <h2 className="text-xl font-bold text-danger-500">Login</h2>
-                        <p className="mb-4 text-small">Dont have an account?&nbsp;
-                            <Link href="/register" className="font-semibold text-danger-400">Register here</Link>
+                        <h2 className="text-2xl font-bold text-danger-500">Login</h2>
+                        <p className="mb-4 mt-2 text-small">Dont have an account?&nbsp;
+                            <Link href="/auth/register" className="font-semibold text-danger-400">Register here</Link>
                         </p>
 
-                        <form className="flex flex-col gap-4 w-80" onSubmit={handleSubmit(handleRegister)}>
-                            <Controller name="fullName" control={control} render={
+                        {errors.root && (
+                            <p className="mb-2 font-medium text-xs text-danger">
+                                {errors?.root?.message}
+                            </p>
+                        )}
+
+                        <form className="flex flex-col gap-4 w-80" onSubmit={handleSubmit(handleLogin)}>
+                            <Controller name="identifier" control={control} render={
                                 ({field}) => <Input {...field} type="text" label="Email / Username" variant="bordered" autoComplete="off" 
-                                isInvalid={errors.fullName !== undefined} errorMessage={errors.fullName?.message} />
+                                isInvalid={errors.identifier !== undefined} errorMessage={errors.identifier?.message} />
                             }/>
                             <Controller name="password" control={control} render={
                                 ({field}) => <Input 
                                 {...field} 
-                                type={visiblePassword.password ? "text" : "password"}
+                                type={isVisible ? "text" : "password"}
                                 label="Password" 
                                 variant="bordered" 
                                 autoComplete="off" 
-                                // isInvalid={errors.password !== undefined} 
-                                // errorMessage={errors.password?.message}
+                                isInvalid={errors.password !== undefined} 
+                                errorMessage={errors.password?.message}
                                 endContent={
-                                    <button className="focus:outline-none" type="button" onClick={() => handleVisiblePassword("password")}>
-                                        {visiblePassword.password ? (
+                                    <button className="focus:outline-none" type="button" onClick={toggleVisible}>
+                                        {isVisible ? (
                                         <FaEye className="text-xl pointer-events-none text-default-400" /> 
                                         ) : (
                                         <FaEyeSlash className="text-xl pointer-events-none text-default-400"/> 
@@ -48,7 +54,7 @@ const Login = () => {
                             }/>
                             
                             <Button color="danger" size="lg" type="submit">
-                                {/* {isPendingRegister ? <Spinner color="white" size="sm" /> : "Masuk"} */} Masuk
+                                {isPendingLogin ? <Spinner color="white" size="sm" /> : "Masuk"} 
                             </Button>
                         </form>
                     </CardBody>

@@ -17,13 +17,13 @@ const Register = () => {
                 </div>
                 <Card>
                     <CardBody className="p-8">
-                        <h2 className="text-xl font-bold text-danger-500">Create Account</h2>
-                        <p className="text-small mb-4">Have an account?&nbsp;
-                            <Link href="/login" className="text-danger-400 font-semibold">Login here</Link>
+                        <h2 className="text-2xl font-bold text-danger-500">Create Account</h2>
+                        <p className="text-small mb-4 mt-2">Have an account?&nbsp;
+                            <Link href="/auth/login" className="text-danger-400 font-semibold">Login here</Link>
                         </p>
 
                         {errors.root && (
-                            <p className="mb-2 font-medium text-danger">
+                            <p className="mb-2 font-medium text-xs text-danger">
                                 {errors?.root?.message}
                             </p>
                         )}

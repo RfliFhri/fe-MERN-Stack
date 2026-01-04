@@ -5,60 +5,58 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import * as yup from 'yup';
 import { ILogin } from "@/types/Auth";
-import authServices from "@/services/auth.service";
+import { signIn } from "next-auth/react";
 
 const loginSchema = yup.object().shape({
-    fullName: yup.string().required("Please input your fullname"),
-    username: yup.string().required("Please input your username"),
-    email: yup.string().email("Email format nnot valid").required("Please input your email"),
-    password: yup.string().min(8, "Minimal 8 Characters").required("Please input your password"),
-    confirmPassword: yup.string().oneOf([yup.ref("password"), ""], "Password not match").required("Please input your password confirmation"),
+    identifier: yup.string().required("Please input your email or username"),
+    password: yup.string().required("Please input your password"),
 });
 
 const useLogin = () => {
     const router = useRouter();
-    const [visiblePassword, setVisiblePassword] = useState({
-            password: false,
-            passwordConfirmation: false,
-        });
+    const [isVisible, setIsVisible] = useState(false);
+
+    const toggleVisible = () => setIsVisible(!isVisible);
+
+    const callbackUrl : string = (router.query.callbackUrl as string) || "/";
     
-    const handleVisiblePassword = (key: "password") => {
-        setVisiblePassword({
-            ...visiblePassword,
-            [key]: !visiblePassword[key],
-        });
-    };
     const {control, handleSubmit, formState: {errors}, reset, setError} = useForm({
         resolver: yupResolver(loginSchema)
     });
 
-    const registerService = async (payload: ILogin) => {
-        const result = await authServices.login(payload);
-        return result;
+    const loginService = async (payload: ILogin) => {
+        const result = await signIn("credentials", {
+            ...payload,
+            redirect: false,
+            callbackUrl,
+        });
+        if(result?.error && result.status === 401) {
+            throw new Error("Email or username not match with your password");
+        }
     };
 
-    const {mutate: mutateRegister, isPending: isPendingRegister} = useMutation({
-        mutationFn: registerService,
+    const {mutate: mutateLogin, isPending: isPendingLogin} = useMutation({
+        mutationFn: loginService,
         onError(error) {
             setError("root", {
                 message: error.message,
             });
         },
         onSuccess: () => {
-            router.push('/auth/register/success')
+            router.push(callbackUrl)
             reset();
         },
     });
 
-    const handleRegister = (data: ILogin) => mutateRegister(data);
+    const handleLogin = (data: ILogin) => mutateLogin(data);
 
     return{
-        visiblePassword,
-        handleVisiblePassword,
+        isVisible,
+        toggleVisible,
         control,
         handleSubmit,
-        handleRegister,
-        isPendingRegister,
+        handleLogin,
+        isPendingLogin,
         errors,
     };
 };
