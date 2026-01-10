@@ -1,12 +1,12 @@
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import Dashboard from "@/components/views/Admin/Dashboard";
+import AuthLayout from "@/components/layouts/AuthLayout";
+import Login from "@/components/views/Auth/Login";
 
-const DashboardAdminPage = () => {
+const LoginPage = () => {
     return (
-        <DashboardLayout title="Dashboard" description="Dashboard Admin" type="admin">
-            <Dashboard />
-        </DashboardLayout>
+        <AuthLayout title="Acara | Login">
+            <Login />
+        </AuthLayout>
     );
 };
 
-export default DashboardAdminPage;
+export default LoginPage;
